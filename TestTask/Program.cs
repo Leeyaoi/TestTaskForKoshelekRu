@@ -4,6 +4,7 @@ using TestTask.DAL.DI;
 using TestTask.Domain.DI;
 using TestTask.API.DI;
 using dotenv.net;
+using Microsoft.Net.Http.Headers;
 
 namespace TestTask.API;
 
@@ -16,6 +17,17 @@ public static class Program
         DotEnv.Load(options: new DotEnvOptions(envFilePaths: new[] { @".env" }));
 
         builder.Configuration.AddEnvironmentVariables();
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(policy =>
+            {
+                policy.WithOrigins(builder.Configuration.GetValue<string>("SENDERCLIENT_ORIGIN")!)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .SetPreflightMaxAge(TimeSpan.FromSeconds(86400));
+            });
+        });
 
         builder.RegisterAPIDependencies();
 
@@ -43,6 +55,11 @@ public static class Program
         app.UseAuthorization();
 
         app.MapControllers();
+
+        app.UseCors(builder => builder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
 
         app.Run();
 
