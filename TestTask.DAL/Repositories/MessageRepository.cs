@@ -18,7 +18,7 @@ public class MessageRepository : IMessageRepository
         _dataSourceBuilder.UseLoggerFactory(loggerFactory);
     }
 
-    public async Task CreateMessage(MessageEntity messageEntity, CancellationToken ct)
+    public async Task<MessageEntity> CreateMessage(MessageEntity messageEntity, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(_dataSourceBuilder);
 
@@ -32,6 +32,7 @@ public class MessageRepository : IMessageRepository
         command.Parameters.AddWithValue("@date", messageEntity.CreatedAt);
         command.Parameters.AddWithValue("@number", messageEntity.Number);
         await command.ExecuteNonQueryAsync(ct);
+        return messageEntity;
     }
 
     public async Task<IReadOnlyCollection<MessageEntity>> GetMessages(DateTime start, DateTime end, CancellationToken ct)

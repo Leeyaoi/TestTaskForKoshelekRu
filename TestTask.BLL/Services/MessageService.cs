@@ -20,11 +20,12 @@ public class MessageService : IMessageService
         _messageRepository = messageRepository;
     }
 
-    public Task CreateMessage(MessageModel messageModel, CancellationToken ct)
+    public async Task<MessageModel> CreateMessage(MessageModel messageModel, CancellationToken ct)
     {
         var messageEntity = _mapper.Map<MessageEntity>(messageModel);
         messageEntity.CreatedAt = _dateTimeProvider.GetDateTime();
-        return _messageRepository.CreateMessage(messageEntity, ct);
+        var entity = await _messageRepository.CreateMessage(messageEntity, ct);
+        return _mapper.Map<MessageModel>(entity);
     }
 
     public async Task<IReadOnlyCollection<MessageModel>> GetMessages(DateTime start, DateTime end, CancellationToken ct)

@@ -28,9 +28,10 @@ public class MessagesController : ControllerBase
 
     // POST api/<MessagesController>
     [HttpPost]
-    public Task Post([FromBody] CreateMessageDto message, CancellationToken ct)
+    public async Task<MessageDto> Post([FromBody] CreateMessageDto message, CancellationToken ct)
     {
         var messageModel = _mapper.Map<MessageModel>(message);
-        return _messageService.CreateMessage(messageModel, ct);
+        var model = await _messageService.CreateMessage(messageModel, ct);
+        return _mapper.Map<MessageDto>(model);
     }
 }

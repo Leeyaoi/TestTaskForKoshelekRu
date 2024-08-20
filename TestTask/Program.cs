@@ -4,6 +4,7 @@ using TestTask.DAL.DI;
 using TestTask.Domain.DI;
 using TestTask.API.DI;
 using dotenv.net;
+using TestTask.API.Hubs;
 
 namespace TestTask.API;
 
@@ -22,8 +23,9 @@ public static class Program
             options.AddDefaultPolicy(policy =>
             {
                 policy.WithOrigins(
-                        builder.Configuration.GetValue<string>("SENDERCLIENT_ORIGIN")!, 
-                        builder.Configuration.GetValue<string>("GETTERCLIENT_ORIGIN")!
+                        builder.Configuration.GetValue<string>("SENDERCLIENT_ORIGIN")!,
+                        builder.Configuration.GetValue<string>("GETTERCLIENT_ORIGIN")!,
+                        builder.Configuration.GetValue<string>("RECIEVERCLIENT_ORIGIN")!
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
@@ -52,16 +54,15 @@ public static class Program
             app.UseSwaggerUI();
         }
 
+        app.UseCors();
+
         app.UseHttpsRedirection();
 
         app.UseAuthorization();
 
         app.MapControllers();
 
-        app.UseCors(builder => builder
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
+        app.MapHub<MessageHub>("/api/Messages/hub").RequireCors();
 
         app.Run();
 

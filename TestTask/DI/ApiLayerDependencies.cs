@@ -11,5 +11,10 @@ public static class ApiLayerDependencies
             .CreateLogger();
 
         builder.Logging.AddSerilog().SetMinimumLevel(LogLevel.Information);
+
+        builder.Services.AddSignalR(options =>
+        {
+            options.EnableDetailedErrors = true;
+        });
     }
 }
