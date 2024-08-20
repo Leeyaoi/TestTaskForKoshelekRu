@@ -4,7 +4,6 @@ using TestTask.DAL.DI;
 using TestTask.Domain.DI;
 using TestTask.API.DI;
 using dotenv.net;
-using Microsoft.Net.Http.Headers;
 
 namespace TestTask.API;
 
@@ -22,7 +21,10 @@ public static class Program
         {
             options.AddDefaultPolicy(policy =>
             {
-                policy.WithOrigins(builder.Configuration.GetValue<string>("SENDERCLIENT_ORIGIN")!)
+                policy.WithOrigins(
+                        builder.Configuration.GetValue<string>("SENDERCLIENT_ORIGIN")!, 
+                        builder.Configuration.GetValue<string>("GETTERCLIENT_ORIGIN")!
+                    )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .SetPreflightMaxAge(TimeSpan.FromSeconds(86400));

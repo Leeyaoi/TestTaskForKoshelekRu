@@ -1,7 +1,6 @@
 const client = axios.create({
   baseURL: "https://localhost:7133/api/Messages",
   timeout: 1000,
-  headers: { "X-Custom-Header": "foobar" },
 });
 
 document.getElementById("SendMessageForm").onload = sessionStorage.setItem(
