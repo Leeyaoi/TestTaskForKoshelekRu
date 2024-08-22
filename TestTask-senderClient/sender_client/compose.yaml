@@ -1,0 +1,13 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+      HTTPS: true
+      SSL_CRT_FILE: ./server.cert
+      SSL_KEY_FILE: ./server.key
+    ports:
+      - 3002:3002
+

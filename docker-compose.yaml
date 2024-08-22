@@ -1,0 +1,72 @@
+services:
+
+  db:
+    image: postgres
+    restart: always
+    user: postgres
+    secrets:
+      - db-password
+    environment:
+      POSTGRES_DB: messages
+      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+    expose:
+      - 5432
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shared-network
+
+  recieverclient:
+    extends:
+      file: ./TestTask-recieverClient/reciever_client/compose.yaml
+      service: server
+    environment:
+      - PORT=3001
+    networks:
+      - shared-network
+
+  getterclient:
+    extends:
+      file: ./TestTask-getterClient/getter_client/compose.yaml
+      service: server
+    environment:
+      - PORT=3000
+    networks:
+      - shared-network
+
+  senderclient:
+    extends:
+      file: ./TestTask-senderClient/sender_client/compose.yaml
+      service: server
+    environment:
+      - PORT=3002
+    networks:
+      - shared-network
+
+  testtask:
+    ports:
+      - "7132:7132"
+      - "7133:7133"
+    env_file:
+      - ./TestTask/.env
+    environment:
+      ASPNETCORE_URLS: "http://+:7132;https://+:7133"
+    depends_on:
+      db:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: .\Dockerfile
+    networks:
+      - shared-network
+
+secrets:
+  db-password:
+    file: db/password.txt
+
+networks:
+  shared-network:
+    driver: bridge
